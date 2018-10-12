@@ -45,4 +45,28 @@ def remove_special_characters(text, remove_digits=False):
     text = re.sub(pattern, '', text)
     return text
 
+def stemmer(text):
+    ps = nltk.PorterStemmer()
+    text = ' '.join([ps.stem(word) for word in text.split()])
+    return text
+
+def lemmatization(text):
+    text = nlp(text)
+    text = ' '.join([word.lemma_ if word.lemma_ != '-PRON-' else word.text for word in text])
+    return text
+
+def remove_stopwords(text, is_lower=False):
+    tokens = tokenizer.tokenize(text)
+    tokens = [token.strip() for token in tokens]
+    if is_lower:
+        filtered_tokens = [token for token in tokens if token not in stopword_list]
+    else:
+        filtered_tokens = [token for token in tokens if token.lower() not in stopword_list]
+    filtered_text = ' '.join(filtered_tokens)
+    return filtered_text
+
+
+
+
+
 
