@@ -1,6 +1,7 @@
 import pandas as pd
 import os
-
+from Clustering.Preprocessing import *
+import pprint
 
 def load_data():
     path = "C:/Users/madfa/Downloads/Git Repository/Document Dictionary/Documents.csv"
@@ -9,8 +10,9 @@ def load_data():
 
 class ImportData:
   news_df = load_data()
-  # news_df.head(10)
-  print(news_df)
+  eda = exploratory_data_analysis(news_df['Content'][1])
+  pp = pprint.PrettyPrinter(indent=4)
+  pp.pprint(eda)
 
 
 
