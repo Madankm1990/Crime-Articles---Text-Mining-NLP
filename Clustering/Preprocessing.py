@@ -2,11 +2,17 @@ import spacy
 import pandas as pd
 import numpy as np
 import nltk
+from nltk import word_tokenize, FreqDist
 from nltk.tokenize.toktok import ToktokTokenizer
 import re
+import string
 from bs4 import BeautifulSoup
 from contractions import CONTRACTION_MAP
 import unicodedata
+import wordcloud
+from wordcloud import WordCloud, ImageColorGenerator
+import matplotlib.pyplot as plt
+import numpy as np
 
 nlp = spacy.load('en', parse=True, tag=True, entity=True)
 #nlp_vec = spacy.load('en_vecs', parse = True, tag=True, entity=True)
@@ -64,6 +70,63 @@ def remove_stopwords(text, is_lower=False):
         filtered_tokens = [token for token in tokens if token.lower() not in stopword_list]
     filtered_text = ' '.join(filtered_tokens)
     return filtered_text
+
+def remove_punctuations(text, is_lower=False):
+    tokens = tokenizer.tokenize(text)
+    tokens = [token.strip() for token in tokens]
+    if is_lower:
+        filtered_tokens = [token for token in tokens if token not in string.punctuation]
+    else:
+        filtered_tokens = [token for token in tokens if token.lower() not in string.punctuation]
+    punc_filtered_text = ' '.join(filtered_tokens)
+    return punc_filtered_text
+
+
+def exploratory_data_analysis(text):
+    eda_dict = {}
+    # How many characters in the article
+    length = len(text)
+    eda_dict['length'] = length
+    tokens = word_tokenize(text)
+    tokens_nop = [t for t in tokens if t not in string.punctuation]
+    # How many words in the article
+    token_length = len(tokens)
+    eda_dict['token_length'] = token_length
+    eda_dict['token_length_without_punc'] = len(tokens_nop)
+    # How many unique words
+    unique = set(tokens)
+    eda_dict['unique words count'] = len(unique)
+    # Number of single characters
+    single = [token for token in unique if len(token) == 1]
+    eda_dict['single character count'] = len(single)
+    # Frequency Distribution of words
+    fd = nltk.FreqDist(tokens)
+    eda_dict['frequency distribution'] = fd
+    # Top 50 common words
+    common = fd.most_common(50)
+    # Frequency distribution plot of the 10 most common words
+    # fd.plot(10)
+    # How long are the words
+    fd_wlen = nltk.FreqDist([len(w) for w in unique])
+    eda_dict['long word count'] = list(filter(lambda x: x[1]>=1,fd_wlen.items()))
+    # Bigrams and Trigrams
+    bigr = nltk.bigrams(tokens[:10])
+    eda_dict['bigrams'] = list(bigr)
+    trigr = nltk.trigrams(tokens[:10])
+    eda_dict['trigrams'] = list(trigr)
+    return eda_dict
+
+def wordcloud(text):
+    wc = WordCloud(background_color="white").generate(text)
+    return wc
+
+
+
+
+
+
+
+
 
 
 
