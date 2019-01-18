@@ -2,60 +2,37 @@ import pandas as pd
 import os
 from Clustering.Preprocessing import *
 import pprint
+import spacy
+
 
 def load_data():
     path = "C:/Users/madfa/Downloads/Git Repository/Document Dictionary/Documents.csv"
     data = pd.read_csv(path,encoding="utf-8")
     return data
 
-def normalize_corpus(corpus, html_stripping=True, contraction = True,
-                     accented_char_removal = True, text_lower = True,
-                     lemmatization = True, special_char_removal = True,
-                     stopword_removal = True, remove_digits = False):
-    normalized_corpus = []
 
-    for doc in corpus:
-        # strip HTML tags
-        if html_stripping:
-            doc = remove_html_tags(doc)
+class textMining:
+    news_df = load_data()
 
-        # remove accented characters
-        if accented_char_removal:
-            doc = remove_accented_chars(doc)
+    # Combining Headlines and Content
+    news_df['full_text'] = news_df['Headlines'].map(str) + '. ' + news_df['Content']
 
-        # expand contractions(doc)
-        if contraction:
-            doc = expand_contractions(doc)
+    # pre-process the text and store
+    news_df['normalized_text'] = normalize_corpus(news_df['full_text'])
+    norm_corpus = list(news_df['normalized_text'])
 
-        # convert to lower case
-        if text_lower:
-            doc = doc.lower()
+    # write the pre-processed text to a new csv
+    news_df.to_csv('pre-processed_news.csv', index=False, encoding='utf-8')
 
-        # remove extra new lines
-        doc = re.sub(r'[\r|\n|\r\n]+',' ', doc)
+    # exploratory data analysis
+    eda = exploratory_data_analysis(news_df['Content'][1])
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(eda)
 
-        # lemmatize text
-        if lemmatization:
-            doc = lemmatization(doc)
-
-        # remove special characters
-        if special_char_removal:
-            special_char = re.compile(r'({.(-)!}])')
-            doc = special_char.sub(" \\1", doc)
-            doc = remove_special_characters(doc, remove_digits=remove_digits)
-
-        # remove extra whitespace
-        doc = re.sub(' +', ' ', doc)
-
-        # remove stopwords
-        if stopword_removal:
-            doc = remove_stopwords(doc, is_lower=text_lower)
-
-class ImportData:
-  news_df = load_data()
-  eda = exploratory_data_analysis(news_df['Content'][1])
-  pp = pprint.PrettyPrinter(indent=4)
-  pp.pprint(eda)
+    # nlp_corpus = normalize_corpus(news_df['full_text'], text_lower=False,
+    #                               lemmatization=False, special_char_removal=False)
+    # # POS tagging with spacy
+    # spacy_pos_tagged = [(word, word.tag_, word.pos_) for word in ]
 
 
 
